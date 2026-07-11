@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://172.19.142.217:5432/csm?currentSchema=csm
+    username: admin
+    password: senha123
+
+  # Avisamos o Flyway qual é o schema principal
+  flyway:
+    enabled: false
+    default-schema: csm
+    schemas: csm
+    baseline-on-migrate: true
+
+  jpa:
+    # Mostra o SQL no console para ajudar no debug
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: csm
+
+    hibernate:
+      # MUITO IMPORTANTE: 'none' ou 'validate'.
+      # Nunca use 'update' ou 'create' em produção ou quando o DDL é manual.
+      ddl-auto: none
+      naming:
+        # Isso faz o Java entender que 'passwordHash' no código é 'password_hash' no banco
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy

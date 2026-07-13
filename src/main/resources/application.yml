@@ -4,9 +4,9 @@ spring:
     username: admin
     password: senha123
 
-  # Avisamos o Flyway qual é o schema principal
+  # Avisamos o Flyway qual o schema principal
   flyway:
-    enabled: false
+    enabled: true
     default-schema: csm
     schemas: csm
     baseline-on-migrate: true
@@ -20,9 +20,7 @@ spring:
         default_schema: csm
 
     hibernate:
-      # MUITO IMPORTANTE: 'none' ou 'validate'.
-      # Nunca use 'update' ou 'create' em produção ou quando o DDL é manual.
       ddl-auto: none
       naming:
-        # Isso faz o Java entender que 'passwordHash' no código é 'password_hash' no banco
+        # Isso faz o Java entender que 'passwordHash' no codigo e 'password_hash' no banco
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy

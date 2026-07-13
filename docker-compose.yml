@@ -1,0 +1,41 @@
+services:
+  # O Banco de Dados
+  db:
+    image: postgres:16-alpine
+    container_name: csm_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: csm_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - csm_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d csm_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # A Aplicação Spring Boot
+  app:
+    build: .
+    container_name: csm_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Credenciais da Aplicação
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/csm_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      # Credenciais do Flyway
+      SPRING_FLYWAY_URL: jdbc:postgresql://db:5432/csm_db
+      SPRING_FLYWAY_USER: postgres
+      SPRING_FLYWAY_PASSWORD: postgres
+
+volumes:
+  csm_data:

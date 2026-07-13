@@ -24,7 +24,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
-        User authenticatedUser = authService.authenticate(request.getLogin(), request.getPassword());
+        User authenticatedUser = authService.authenticate(request.login(), request.password());
 
         String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...mock_token_temporario";
 
@@ -47,7 +47,7 @@ public class AuthController {
     @PostMapping("/userinfo")
     public ResponseEntity<UserInfoResponseDTO> userInfo(@Valid @RequestBody UserInfoRequestDTO request) {
 
-        User user = authService.userInfo(request.getId());
+        User user = authService.userInfo(request.id());
 
         UserInfoResponseDTO.UserDate userDate = UserInfoResponseDTO.UserDate.builder()
                 .createdAt(user.getCreatedAt())

@@ -16,23 +16,23 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
 
     public CreateResponseDTO create (CreateRequestDTO request) {
-        String clientId = "csm-" + request.getAcronym().toLowerCase() + "-" + UUID.randomUUID().toString().substring(0, 8);
+        String clientId = "csm-" + request.acronym().toLowerCase() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String secret = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
 
         Application application = Application.builder()
                 .clientId(clientId)
                 .clientSecretHash(secret)
-                .name(request.getName())
-                .acronym(request.getAcronym())
-                .url(request.getUrl())
-                .redirectUri(request.getRedirectUri())
+                .name(request.gitNamespace())
+                .acronym(request.acronym())
+                .url(request.url())
+                .redirectUri(request.redirectUri())
                 .status(1)
                 .isPublished(false)
-                .objective(request.getObjective())
-                .notes(request.getNotes())
-                .requester(request.getRequester())
-                .projectStartDate(request.getProjectStartDate())
-                .gitNamespace(request.getGitNamespace())
+                .objective(request.objective())
+                .notes(request.notes())
+                .requester(request.requester())
+                .projectStartDate(request.projectStartDate())
+                .gitNamespace(request.gitNamespace())
                 .build();
 
         Application app = applicationRepository.save(application);

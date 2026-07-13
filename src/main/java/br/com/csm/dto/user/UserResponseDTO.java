@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Builder
-public record CreateResponseDTO(
+public record UserResponseDTO(
         UUID id,
         String name,
         String cpf,

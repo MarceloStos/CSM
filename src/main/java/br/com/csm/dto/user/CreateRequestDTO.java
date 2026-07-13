@@ -13,6 +13,7 @@ public record CreateRequestDTO (
     String cpf,
     @NotBlank(message = "O login é obrigatótrio")
     String login,
+    @NotBlank
     @Email(message = "Formato de e-mail inválido")
     String email,
     @NotBlank(message = "A senha é obrigatótrio")

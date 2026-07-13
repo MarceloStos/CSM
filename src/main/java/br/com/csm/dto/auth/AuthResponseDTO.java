@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Builder
-public class AuthResponse {
+public class AuthResponseDTO {
 
     private String accessToken;
     private String tokenType;

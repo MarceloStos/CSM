@@ -1,6 +1,6 @@
 package br.com.csm.exception;
 
-import br.com.csm.dto.error.ApiErrorResponse;
+import br.com.csm.dto.error.ApiErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +14,13 @@ import java.time.OffsetDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(
+    public ResponseEntity<ApiErrorResponseDTO> handleAuthenticationException(
             AuthenticationException ex,
             HttpServletRequest request) {
 
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
-        ApiErrorResponse errorPayload = ApiErrorResponse.builder()
+        ApiErrorResponseDTO errorPayload = ApiErrorResponseDTO.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
@@ -32,13 +32,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGeneralException(
+    public ResponseEntity<ApiErrorResponseDTO> handleGeneralException(
             Exception ex,
             HttpServletRequest request) {
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        ApiErrorResponse errorPayload = ApiErrorResponse.builder()
+        ApiErrorResponseDTO errorPayload = ApiErrorResponseDTO.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())

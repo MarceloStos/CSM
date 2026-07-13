@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class LoginRequestDTO {
 
     @NotBlank(message = "O campo login não pode estar vazio")
     private String login;

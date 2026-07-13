@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class UserInfoRequest {
+public class UserInfoRequestDTO {
     @NotBlank(message = "O ID do usuário é obrigatório")
     private UUID id;
 }

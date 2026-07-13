@@ -1,14 +1,12 @@
 package br.com.csm.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Builder;
 
-@Data
-public class LoginRequestDTO {
-
+@Builder
+public record LoginRequestDTO (
     @NotBlank(message = "O campo login não pode estar vazio")
-    private String login;
-
+    String login,
     @NotBlank(message = "O campo senha não pode estar vazio")
-    private String password;
-}
+    String password
+){}

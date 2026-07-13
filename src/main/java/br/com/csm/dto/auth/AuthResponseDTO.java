@@ -1,24 +1,23 @@
 package br.com.csm.dto.auth;
 
-
 import lombok.Builder;
-import lombok.Data;
 
 import java.util.UUID;
 
 @Builder
-public class AuthResponseDTO {
+public record AuthResponseDTO(
 
-    private String accessToken;
-    private String tokenType;
-    private Integer expiresIn;
-    private UserSummary user;
+        String accessToken,
+        String tokenType,
+        Integer expiresIn,
+        UserSummary user
+) {
 
-    @Data
     @Builder
-    public static class UserSummary {
-        private UUID id;
-        private String name;
-        private String login;
+    public record UserSummary(
+            UUID id,
+            String name,
+            String login
+    ) {
     }
 }

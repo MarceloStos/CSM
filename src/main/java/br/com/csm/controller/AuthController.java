@@ -6,6 +6,7 @@ import br.com.csm.dto.user.UserInfoRequestDTO;
 import br.com.csm.dto.user.UserInfoResponseDTO;
 import br.com.csm.model.User;
 import br.com.csm.service.AuthService;
+import br.com.csm.service.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
         User authenticatedUser = authService.authenticate(request.login(), request.password());
 
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...mock_token_temporario";
+        String jwtToken = tokenService.generateToken(authenticatedUser);
 
         AuthResponseDTO.UserSummary userSummary = AuthResponseDTO.UserSummary.builder()
                 .id(authenticatedUser.getId())
@@ -35,7 +37,7 @@ public class AuthController {
                 .build();
 
         AuthResponseDTO response = AuthResponseDTO.builder()
-                .accessToken(token)
+                .accessToken(jwtToken)
                 .tokenType("Bearer")
                 .expiresIn(900)
                 .user(userSummary)

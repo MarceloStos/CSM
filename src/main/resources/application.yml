@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/csm_db?currentSchema=csm
     username: postgres
-    password: postgres
+    password: ${DB_PASSWORD:postgres}
 
   # Avisamos o Flyway qual o schema principal
   flyway:
@@ -24,3 +24,9 @@ spring:
       naming:
         # Isso faz o Java entender que 'passwordHash' no codigo e 'password_hash' no banco
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+
+    api:
+      security:
+        token:
+          # Nota: A string de fallback precisa ter mais de 32 caracteres para o algoritmo HMAC256 funcionar.
+          secret: ${CSM_JWT_SECRET:chave-padrao-provisoria-para-testes-locais-1234567890}

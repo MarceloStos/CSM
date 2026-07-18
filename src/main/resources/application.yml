@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://172.19.142.217:5432/csm?currentSchema=csm
-    username: admin
-    password: senha123
+    url: jdbc:postgresql://localhost:5433/csm_db?currentSchema=csm
+    username: postgres
+    password: postgres
 
   # Avisamos o Flyway qual o schema principal
   flyway:

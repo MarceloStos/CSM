@@ -5,6 +5,7 @@ import br.com.csm.dto.user.UserResponseDTO;
 import br.com.csm.model.User;
 import br.com.csm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponseDTO createUser(CreateRequestDTO request) {
@@ -28,14 +30,14 @@ public class UserService {
             throw new IllegalArgumentException("Já existe um usuário com este email.");
         }
 
-        String password = request.password();
+        String hashedPassword = passwordEncoder.encode(request.password());
 
         User newUser = User.builder()
                 .name(request.name())
                 .cpf(request.cpf())
                 .login(request.login())
                 .email(request.email())
-                .passwordHash(password)
+                .passwordHash(hashedPassword)
                 .status(1)
                 .failedAttempts(0)
                 .forcePasswordChange(true) // Força o usuário a trocar a senha no primeiro login

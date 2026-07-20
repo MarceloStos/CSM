@@ -2,8 +2,11 @@ package br.com.csm.repository;
 
 import br.com.csm.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +16,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByLogin(String login);
 
     Optional<User> findByEmail(String email);
+
+    @Query("SELECT u FROM User u WHERE u.login = :login " +
+            "AND u.status = :status " +
+            "AND u.deletedAt IS NULL " +
+            "AND (u.blockedUntil IS NULL OR u.blockedUntil < :now)")
+    Optional<User> findActiveAndUnblockedUser(
+            @Param("login") String login,
+            @Param("status") Integer status,
+            @Param("now") OffsetDateTime now
+    );
 }

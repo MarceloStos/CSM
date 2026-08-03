@@ -4,8 +4,10 @@
 
 -- Clean up existing tables to avoid conflict during creation
 DROP TABLE IF EXISTS csm.user_roles CASCADE;
+DROP TABLE IF EXISTS csm.role_permissions CASCADE;
+DROP TABLE IF EXISTS csm.permissions CASCADE;
 DROP TABLE IF EXISTS csm.roles CASCADE;
-DROP TABLE IF EXISTS csm.sistemas CASCADE; -- Removendo tabela legada se existir
+DROP TABLE IF EXISTS csm.sistemas CASCADE;
 DROP TABLE IF EXISTS csm.applications CASCADE;
 DROP TABLE IF EXISTS csm.users CASCADE;
 
@@ -127,4 +129,41 @@ CREATE TABLE csm.user_roles
     PRIMARY KEY (user_id, role_id),
     CONSTRAINT fk_ur_user FOREIGN KEY (user_id) REFERENCES csm.users (id) ON DELETE CASCADE,
     CONSTRAINT fk_ur_role FOREIGN KEY (role_id) REFERENCES csm.roles (id) ON DELETE CASCADE
+);
+
+-- ----------------------------------------------------------------------------
+-- 5. PERMISSIONS TABLE
+-- Granular technical actions allowed inside each application.
+-- ----------------------------------------------------------------------------
+CREATE TABLE csm.permissions
+(
+    id             uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+    application_id uuid                                  NOT NULL,
+
+    name           varchar(100)                          NOT NULL, -- e.g., 'SYSTEM_DISABLE', 'USER_CREATE'
+    description    varchar(255),
+
+    created_at     timestamptz DEFAULT current_timestamp NOT NULL,
+
+    -- Relationship Constraints
+    CONSTRAINT fk_permissions_applications FOREIGN KEY (application_id) REFERENCES csm.applications (id) ON DELETE CASCADE,
+    -- Prevent duplicate permissions inside the exact same application
+    CONSTRAINT un_permission_application UNIQUE (application_id, name)
+);
+
+-- ----------------------------------------------------------------------------
+-- 6. ROLE_PERMISSIONS TABLE
+-- Many-to-Many junction table linking Roles to their granted Permissions.
+-- ----------------------------------------------------------------------------
+CREATE TABLE csm.role_permissions
+(
+    role_id       uuid                                  NOT NULL,
+    permission_id uuid                                  NOT NULL,
+
+    assigned_at   timestamptz DEFAULT current_timestamp NOT NULL,
+
+    -- Composite Primary Key prevents duplicate entries
+    PRIMARY KEY (role_id, permission_id),
+    CONSTRAINT fk_rp_role FOREIGN KEY (role_id) REFERENCES csm.roles (id) ON DELETE CASCADE,
+    CONSTRAINT fk_rp_permission FOREIGN KEY (permission_id) REFERENCES csm.permissions (id) ON DELETE CASCADE
 );

@@ -21,7 +21,7 @@ public class AuthService {
     @Transactional
     public User authenticate(String login, String rawPassword){
 
-        User user = userRepository.findActiveAndUnblockedUser(login, 1, OffsetDateTime.now())
+        User user = userRepository.findActiveAndUnblockedUserWithPermissions(login, 1, OffsetDateTime.now())
                 .orElseThrow(() -> new AuthenticationException("Credenciais inválidas ou conta inativa/bloqueada"));
 
         if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {

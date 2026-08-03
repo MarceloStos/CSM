@@ -14,14 +14,18 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByLogin(String login);
-
     Optional<User> findByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.login = :login " +
+    Optional<User> findByLoginAndStatusAndDeletedAtIsNull(String login, Integer status);
+
+    @Query("SELECT u FROM User u " +
+            "LEFT JOIN FETCH u.roles r " +
+            "LEFT JOIN FETCH r.permissions " +
+            "WHERE u.login = :login " +
             "AND u.status = :status " +
             "AND u.deletedAt IS NULL " +
             "AND (u.blockedUntil IS NULL OR u.blockedUntil < :now)")
-    Optional<User> findActiveAndUnblockedUser(
+    Optional<User> findActiveAndUnblockedUserWithPermissions(
             @Param("login") String login,
             @Param("status") Integer status,
             @Param("now") OffsetDateTime now

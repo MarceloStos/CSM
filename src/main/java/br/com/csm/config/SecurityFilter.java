@@ -3,12 +3,14 @@ package br.com.csm.config;
 import br.com.csm.model.User;
 import br.com.csm.repository.UserRepository;
 import br.com.csm.service.TokenService;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -32,15 +35,22 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null) {
             //Valida a assinatura e pega o token que esta dentro
-            var login = tokenService.validateToken(token);
-            if (!login.isEmpty()) {
+            DecodedJWT jwt = tokenService.validateTokenAndGetClaims(token);
+            if (jwt != null) {
+                String login = jwt.getSubject();
+
+                List<String> permissions = jwt.getClaim("permissions").asList(String.class);
+
+                List<SimpleGrantedAuthority> authorities = permissions.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
+
                 // Busca o usuario para garantir que ele ainda existe
-                User user = userRepository.findActiveAndUnblockedUser(login, 1, OffsetDateTime.now()).orElse(null);
+                User user = userRepository.findByLoginAndStatusAndDeletedAtIsNull(login, 1).orElse(null);
 
                 if (user != null) {
                     //Cria o objeto de autenticacao do spring
-                    //Todo substituir o collections.emptylist por Roles
-                    var authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                    var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
 
                     // Salva o usuario no contexto da requisicao
                     SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1,9 +1,7 @@
 package br.com.csm.controller;
 
-import br.com.csm.dto.auth.AuthResponseDTO;
-import br.com.csm.dto.auth.LoginRequestDTO;
-import br.com.csm.dto.user.UserInfoRequestDTO;
-import br.com.csm.dto.user.UserInfoResponseDTO;
+import br.com.csm.dto.AuthDTO;
+import br.com.csm.dto.UserDTO;
 import br.com.csm.model.User;
 import br.com.csm.service.AuthService;
 import br.com.csm.service.TokenService;
@@ -24,19 +22,19 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
 
         User authenticatedUser = authService.authenticate(request.login(), request.password());
 
         String jwtToken = tokenService.generateToken(authenticatedUser);
 
-        AuthResponseDTO.UserSummary userSummary = AuthResponseDTO.UserSummary.builder()
+        AuthDTO.AuthResponse.UserSummary userSummary = AuthDTO.AuthResponse.UserSummary.builder()
                 .id(authenticatedUser.getId())
                 .name(authenticatedUser.getName())
                 .login(authenticatedUser.getLogin())
                 .build();
 
-        AuthResponseDTO response = AuthResponseDTO.builder()
+        AuthDTO.AuthResponse response = AuthDTO.AuthResponse.builder()
                 .accessToken(jwtToken)
                 .tokenType("Bearer")
                 .expiresIn(900)
@@ -47,18 +45,18 @@ public class AuthController {
     }
 
     @PostMapping("/userinfo")
-    public ResponseEntity<UserInfoResponseDTO> userInfo(@Valid @RequestBody UserInfoRequestDTO request) {
+    public ResponseEntity<UserDTO.UserInfoResponse> userInfo(@Valid @RequestBody UserDTO.UserInfoRequest request) {
 
         User user = authService.userInfo(request.id());
 
-        UserInfoResponseDTO.UserDate userDate = UserInfoResponseDTO.UserDate.builder()
+        UserDTO.UserInfoResponse.UserDate userDate = UserDTO.UserInfoResponse.UserDate.builder()
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .deletedAt(user.getDeletedAt())
                 .lastLogin(user.getLastLogin())
                 .build();
 
-        UserInfoResponseDTO.UserCorporativeData userCorporativeData = UserInfoResponseDTO.UserCorporativeData.builder()
+        UserDTO.UserInfoResponse.UserCorporativeData userCorporativeData = UserDTO.UserInfoResponse.UserCorporativeData.builder()
                 .objectguid(user.getObjectguid())
                 .registrationNumber(user.getRegistrationNumber())
                 .status(user.getStatus())
@@ -68,12 +66,12 @@ public class AuthController {
                 .photoId(user.getPhotoId())
                 .build();
 
-        UserInfoResponseDTO.UserSecurity userSecurity = UserInfoResponseDTO.UserSecurity.builder()
+        UserDTO.UserInfoResponse.UserSecurity userSecurity = UserDTO.UserInfoResponse.UserSecurity.builder()
                 .failedAttempts(user.getFailedAttempts())
                 .blockedUntil(user.getBlockedUntil())
                 .build();
 
-        UserInfoResponseDTO response = UserInfoResponseDTO.builder()
+        UserDTO.UserInfoResponse response = UserDTO.UserInfoResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .cpf(user.getCpf())

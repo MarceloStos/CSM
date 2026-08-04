@@ -1,7 +1,6 @@
 package br.com.csm.service;
 
-import br.com.csm.dto.application.CreateRequestDTO;
-import br.com.csm.dto.application.CreateResponseDTO;
+import br.com.csm.dto.ApplicationDTO;
 import br.com.csm.model.Application;
 import br.com.csm.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
-    public CreateResponseDTO create (CreateRequestDTO request) {
+    public ApplicationDTO.CreateResponse create (ApplicationDTO.CreateRequest request) {
         String clientId = "csm-" + request.acronym().toLowerCase() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String secret = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
 
@@ -37,7 +36,7 @@ public class ApplicationService {
 
         Application app = applicationRepository.save(application);
 
-        return CreateResponseDTO.builder()
+        return ApplicationDTO.CreateResponse.builder()
                 .id(app.getId())
                 .name(app.getName())
                 .acronym(app.getAcronym())

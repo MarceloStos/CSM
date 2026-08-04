@@ -1,7 +1,6 @@
 package br.com.csm.service;
 
-import br.com.csm.dto.user.CreateRequestDTO;
-import br.com.csm.dto.user.UserResponseDTO;
+import br.com.csm.dto.UserDTO;
 import br.com.csm.model.User;
 import br.com.csm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserResponseDTO createUser(CreateRequestDTO request) {
+    public UserDTO.UserResponse createUser(UserDTO.CreateRequest request) {
 
         // Para verificação de unicidade
         if (userRepository.findByLogin(request.login()).isPresent()) {
@@ -49,15 +48,15 @@ public class UserService {
         return responseDTO(savedUser);
     }
 
-    public UserResponseDTO getUserById(UUID id) {
+    public UserDTO.UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         return responseDTO(user);
     }
 
-    private UserResponseDTO responseDTO(User user) {
-        return UserResponseDTO.builder()
+    private UserDTO.UserResponse responseDTO(User user) {
+        return UserDTO.UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .cpf(user.getCpf())

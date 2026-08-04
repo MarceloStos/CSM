@@ -1,6 +1,6 @@
 package br.com.csm.exception;
 
-import br.com.csm.dto.error.ApiErrorResponseDTO;
+import br.com.csm.dto.ErrorDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleAuthenticationException(
+    public ResponseEntity<ErrorDTO.ApiErrorResponse> handleAuthenticationException(
             AuthenticationException ex,
             HttpServletRequest request) {
 
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
-        ApiErrorResponseDTO error = ApiErrorResponseDTO.builder()
+        ErrorDTO.ApiErrorResponse error = ErrorDTO.ApiErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
@@ -36,12 +36,12 @@ public class GlobalExceptionHandler {
 
     // Caso o usuario tenta acessar uma rota interna sem o token JWT
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleSpringSecurityAuthenticationException(
+    public ResponseEntity<ErrorDTO.ApiErrorResponse> handleSpringSecurityAuthenticationException(
             AuthenticationException ex, HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
-        ApiErrorResponseDTO error = ApiErrorResponseDTO.builder()
+        ErrorDTO.ApiErrorResponse error = ErrorDTO.ApiErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
@@ -53,10 +53,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request){
+    public ResponseEntity<ErrorDTO.ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request){
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ApiErrorResponseDTO error = ApiErrorResponseDTO.builder()
+        ErrorDTO.ApiErrorResponse error = ErrorDTO.ApiErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request){
+    public ResponseEntity<ErrorDTO.ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request){
 
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        ApiErrorResponseDTO error = ApiErrorResponseDTO.builder()
+        ErrorDTO.ApiErrorResponse error = ErrorDTO.ApiErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error("Validation error")
@@ -88,12 +88,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponseDTO> handleAllUncaughtExceptions(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorDTO.ApiErrorResponse> handleAllUncaughtExceptions(Exception ex, HttpServletRequest request) {
 
         ex.getStackTrace();
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        ApiErrorResponseDTO error = ApiErrorResponseDTO.builder()
+        ErrorDTO.ApiErrorResponse error = ErrorDTO.ApiErrorResponse.builder()
                 .timestamp(OffsetDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())

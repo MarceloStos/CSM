@@ -1,7 +1,6 @@
 package br.com.csm.controller;
 
-import br.com.csm.dto.application.CreateRequestDTO;
-import br.com.csm.dto.application.CreateResponseDTO;
+import br.com.csm.dto.ApplicationDTO;
 import br.com.csm.service.ApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,9 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @PostMapping
-    public ResponseEntity<CreateResponseDTO> createApplication (@Valid @RequestBody CreateRequestDTO request) {
+    public ResponseEntity<ApplicationDTO.CreateResponse> createApplication (@Valid @RequestBody ApplicationDTO.CreateRequest request) {
 
-        CreateResponseDTO response = applicationService.create(request);
+        ApplicationDTO.CreateResponse response = applicationService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

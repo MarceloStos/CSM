@@ -1,29 +1,31 @@
 package br.com.csm.controller;
 
-import br.com.csm.dto.ApplicationDTO;
-import br.com.csm.service.ApplicationService;
+import br.com.csm.dto.PermissionDTO;
+import br.com.csm.model.Permission;
+import br.com.csm.service.PermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/application")
+@RequestMapping("/api/admin/permissions")
 @RequiredArgsConstructor
-public class ApplicationController {
+public class PermissionController {
 
-    private final ApplicationService applicationService;
+    private final PermissionService permissionService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
-    public ResponseEntity<ApplicationDTO.CreateResponse> createApplication (@Valid @RequestBody ApplicationDTO.CreateRequest request) {
-
-        ApplicationDTO.CreateResponse response = applicationService.createApplication(request);
+    @PreAuthorize("hasAuthority('PERMISSION_CREATE')")
+    public ResponseEntity<PermissionDTO.Response> createPermission (@Valid @RequestBody PermissionDTO.CreateRequest request) {
+        PermissionDTO.Response response = permissionService.createPermission(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 }

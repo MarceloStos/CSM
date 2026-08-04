@@ -1,7 +1,7 @@
 package br.com.csm.controller;
 
-import br.com.csm.dto.ApplicationDTO;
-import br.com.csm.service.ApplicationService;
+import br.com.csm.dto.RoleDTO;
+import br.com.csm.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,17 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/application")
+@RequestMapping("/api/admin/roles")
 @RequiredArgsConstructor
-public class ApplicationController {
+public class RoleController {
 
-    private final ApplicationService applicationService;
+    private final RoleService roleService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
-    public ResponseEntity<ApplicationDTO.CreateResponse> createApplication (@Valid @RequestBody ApplicationDTO.CreateRequest request) {
-
-        ApplicationDTO.CreateResponse response = applicationService.createApplication(request);
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
+    public ResponseEntity<RoleDTO.Response> createRole (@Valid @RequestBody RoleDTO.CreateRequest request) {
+        RoleDTO.Response response = roleService.createRole(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

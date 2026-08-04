@@ -3,6 +3,7 @@ package br.com.csm.service;
 import br.com.csm.dto.ApplicationDTO;
 import br.com.csm.model.Application;
 import br.com.csm.repository.ApplicationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,8 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
-    public ApplicationDTO.CreateResponse create (ApplicationDTO.CreateRequest request) {
+    @Transactional
+    public ApplicationDTO.CreateResponse createApplication(ApplicationDTO.CreateRequest request) {
         String clientId = "csm-" + request.acronym().toLowerCase() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String secret = UUID.randomUUID().toString() + "-" + UUID.randomUUID().toString();
 

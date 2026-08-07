@@ -1,2 +1,2 @@
 INSERT INTO csm.users (name, cpf, login, password_hash, email, status)
-VALUES ('Administrador', '11122233344', 'admin', 'senha123', 'admin@csm.com', 1);
+VALUES ('Administrador', '11122233344', 'admin', '$argon2id$v=19$m=16384,t=2,p=1$fusZvJJTmXNFufYfcHwU4g$LHo63vHRFtVXge92g60gyBQVE0JyqP304diTryBICqU', 'admin@csm.com', 1);

@@ -79,8 +79,6 @@ public class User {
 
     private OffsetDateTime lastLogin;
 
-    private OffsetDateTime deactivatedAt;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles", schema = "csm",

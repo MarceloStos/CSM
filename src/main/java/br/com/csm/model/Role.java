@@ -11,8 +11,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "roles", schema = "csm")
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

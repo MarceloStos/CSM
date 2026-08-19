@@ -12,8 +12,9 @@ import java.util.UUID;
                @UniqueConstraint(name = "un_permission_application", columnNames = {"application_id", "name"})
         }
 )
-@Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

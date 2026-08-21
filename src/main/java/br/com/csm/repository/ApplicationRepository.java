@@ -4,6 +4,8 @@ import br.com.csm.model.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,5 +17,5 @@ public interface ApplicationRepository extends JpaRepository<Application, UUID> 
 
     Optional<Application> findByClientId(String clientId);
 
-
+    List<Application> findAllByDeactivatedAtIsNull();
 }

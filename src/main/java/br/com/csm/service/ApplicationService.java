@@ -7,7 +7,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +47,16 @@ public class ApplicationService {
                 .clientId(app.getClientId())
                 .clientSecret(app.getClientSecretHash())
                 .build();
+    }
+
+    public List<ApplicationDTO.ApplicationList> listAll() {
+        return applicationRepository.findAllByDeactivatedAtIsNull().stream()
+                .map(app -> new ApplicationDTO.ApplicationList(
+                        app.getId(),
+                        app.getName(),
+                        app.getAcronym(),
+                        app.getStatus()
+                ))
+                .collect(Collectors.toList());
     }
 }

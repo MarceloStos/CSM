@@ -35,5 +35,11 @@ public class ApplicationDTO {
             String clientSecret
     ){}
 
-
+    @Builder
+    public record ApplicationList(
+        UUID id,
+        String name,
+        String Acronym,
+        Integer status
+    ){}
 }

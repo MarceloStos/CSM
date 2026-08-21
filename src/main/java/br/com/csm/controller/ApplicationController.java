@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/application")
 @RequiredArgsConstructor
@@ -19,8 +21,12 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
+    public ResponseEntity<List<ApplicationDTO.ApplicationList>> listAll() {
+        List<ApplicationDTO.ApplicationList> applications = applicationService.listAll();
+        return ResponseEntity.status(HttpStatus.OK).body(applications);
+    }
+
     @PostMapping
-    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
     public ResponseEntity<ApplicationDTO.CreateResponse> createApplication (@Valid @RequestBody ApplicationDTO.CreateRequest request) {
 
         ApplicationDTO.CreateResponse response = applicationService.createApplication(request);

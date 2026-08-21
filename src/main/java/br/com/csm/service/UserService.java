@@ -8,7 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +55,18 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         return responseDTO(user);
+    }
+
+    public List<UserDTO.UserList> listAllUsers () {
+        return userRepository.findAllByDeletedAtIsNull().stream()
+                .map(user -> new UserDTO.UserList(
+                        user.getId(),
+                        user.getName(),
+                        user.getLogin(),
+                        user.getEmail(),
+                        user.getStatus()
+                ))
+                .collect(Collectors.toList());
     }
 
     private UserDTO.UserResponse responseDTO(User user) {

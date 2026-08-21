@@ -83,4 +83,13 @@ public class UserDTO {
         ){}
     }
 
+    @Builder
+    public record UserList(
+            UUID uuid,
+            String name,
+            String login,
+            String email,
+            Integer status
+    ){}
+
 }

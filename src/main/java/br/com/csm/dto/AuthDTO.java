@@ -3,6 +3,7 @@ package br.com.csm.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class AuthDTO {
@@ -20,7 +21,9 @@ public class AuthDTO {
         public record UserSummary(
                 UUID id,
                 String name,
-                String login
+                String login,
+                Set<String> roles,
+                Set<String> permissions
         ) {
         }
     }

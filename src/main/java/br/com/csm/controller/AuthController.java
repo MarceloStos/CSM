@@ -1,12 +1,14 @@
 package br.com.csm.controller;
 
 import br.com.csm.dto.AuthDTO;
+import br.com.csm.dto.PermissionDTO;
 import br.com.csm.dto.UserDTO;
 import br.com.csm.model.User;
 import br.com.csm.service.AuthService;
 import br.com.csm.service.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,25 +25,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
-
-        User authenticatedUser = authService.authenticate(request.login(), request.password());
-
-        String jwtToken = tokenService.generateToken(authenticatedUser);
-
-        AuthDTO.AuthResponse.UserSummary userSummary = AuthDTO.AuthResponse.UserSummary.builder()
-                .id(authenticatedUser.getId())
-                .name(authenticatedUser.getName())
-                .login(authenticatedUser.getLogin())
-                .build();
-
-        AuthDTO.AuthResponse response = AuthDTO.AuthResponse.builder()
-                .accessToken(jwtToken)
-                .tokenType("Bearer")
-                .expiresIn(900)
-                .user(userSummary)
-                .build();
-
-        return ResponseEntity.ok(response);
+        AuthDTO.AuthResponse response = authService.authenticate(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/userinfo")

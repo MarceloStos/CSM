@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -69,6 +70,35 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void updateUser (UUID userId, UserDTO.UserUpdate request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+
+        if (request.name() != null && !request.name().isBlank()) user.setName(request.name());
+        if (request.login() != null && !request.login().isBlank()) user.setLogin(request.login());
+        if (request.email() != null && !request.email().isBlank()) user.setEmail(request.email());
+
+        // Só atualiza a senha se ela vier preenchida do frontend
+        if (request.password() != null && !request.password().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(request.password()));
+        }
+
+        user.setUpdatedAt(OffsetDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+
+        // Soft Delete
+        user.setDeletedAt(OffsetDateTime.now());
+        user.setStatus(0); // 0 = Inativo
+
+        userRepository.save(user);
+    }
     private UserDTO.UserResponse responseDTO(User user) {
         return UserDTO.UserResponse.builder()
                 .id(user.getId())

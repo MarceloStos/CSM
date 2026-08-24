@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +28,17 @@ public class UserController {
     public ResponseEntity<UserDTO.UserResponse> createUser (@Valid @RequestBody UserDTO.CreateRequest request) {
         UserDTO.UserResponse user = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable UUID id, @RequestBody UserDTO.UserUpdate request) {
+        userService.updateUser(id, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Sucesso, sem corpo de resposta
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        userService.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
     }
 }

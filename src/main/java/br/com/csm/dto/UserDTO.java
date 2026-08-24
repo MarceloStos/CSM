@@ -92,4 +92,12 @@ public class UserDTO {
             Integer status
     ){}
 
+    @Builder
+    public record UserUpdate(
+            String name,
+            String login,
+            String email,
+            String password
+    ){}
+
 }

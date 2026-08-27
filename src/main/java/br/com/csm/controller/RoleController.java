@@ -27,7 +27,7 @@ public class RoleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @GetMapping
-    public ResponseEntity<List<RoleDTO.RoleList>> listAll() {
+    public ResponseEntity<List<RoleDTO.RoleList>> listAllRoles() {
         List<RoleDTO.RoleList> roles = roleService.listAllRoles();
         return ResponseEntity.status(HttpStatus.OK).body(roles);
     }

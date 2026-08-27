@@ -88,7 +88,7 @@ public class UserDTO {
 
     @Builder
     public record UserList(
-            UUID uuid,
+            UUID id,
             String name,
             String login,
             String email,

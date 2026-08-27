@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class PermissionDTO {
@@ -24,6 +25,21 @@ public class PermissionDTO {
             String name,
             String description,
             UUID applicationId
+    ){}
+
+    @Builder
+    public record PermissionList(
+            UUID id,
+            String name,
+            String description,
+            String application,
+            UUID applicationId
+    ){}
+
+    @Builder
+    public record PermissionUpdate(
+            String name,
+            String description
     ){}
 
 }

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 public class ApplicationDTO {
@@ -39,7 +41,18 @@ public class ApplicationDTO {
     public record ApplicationList(
         UUID id,
         String name,
-        String Acronym,
-        Integer status
+        String acronym,
+        String url,
+        Integer status,
+        OffsetDateTime updatedAt,
+        OffsetDateTime createdAt
+        ){}
+
+    @Builder
+    public record ApplicationUpdate(
+            String name,
+            String acronym,
+            String url,
+            Integer status
     ){}
 }

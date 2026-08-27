@@ -1,6 +1,7 @@
 package br.com.csm.repository;
 
 import br.com.csm.model.Application;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -16,4 +17,6 @@ public interface ApplicationRepository extends JpaRepository<Application, UUID> 
     Optional<Application> findByClientId(String clientId);
 
     List<Application> findAllByDeactivatedAtIsNull();
+
+    Optional<Object> findByAcronym(String acronym);
 }

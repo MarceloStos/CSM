@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserDTO {
@@ -23,7 +25,8 @@ public class UserDTO {
             String email,
             @NotBlank(message = "A senha é obrigatótrio")
             @Size(min = 8, message = "A senha deve ter no minimo 8 caracteres")
-            String password
+            String password,
+            Set<UUID> roleIds
     ){
     }
 
@@ -89,7 +92,8 @@ public class UserDTO {
             String name,
             String login,
             String email,
-            Integer status
+            Integer status,
+            List<UUID> roleIds
     ){}
 
     @Builder
@@ -97,7 +101,8 @@ public class UserDTO {
             String name,
             String login,
             String email,
-            String password
+            String password,
+            Set<UUID> roleIds
     ){}
 
 }

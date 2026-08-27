@@ -1,7 +1,9 @@
 package br.com.csm.service;
 
 import br.com.csm.dto.UserDTO;
+import br.com.csm.model.Role;
 import br.com.csm.model.User;
+import br.com.csm.repository.RoleRepository;
 import br.com.csm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -34,6 +39,11 @@ public class UserService {
 
         String hashedPassword = passwordEncoder.encode(request.password());
 
+        Set<Role> userRoles = new HashSet<>();
+        if (request.roleIds() != null && !request.roleIds().isEmpty()) {
+            userRoles.addAll(roleRepository.findAllById(request.roleIds()));
+        }
+
         User newUser = User.builder()
                 .name(request.name())
                 .cpf(request.cpf())
@@ -44,6 +54,7 @@ public class UserService {
                 .failedAttempts(0)
                 .forcePasswordChange(true) // Força o usuário a trocar a senha no primeiro login
                 .hiddenTutorial(false)
+                .roles(userRoles)
                 .build();
 
         User savedUser = userRepository.save(newUser);
@@ -65,7 +76,8 @@ public class UserService {
                         user.getName(),
                         user.getLogin(),
                         user.getEmail(),
-                        user.getStatus()
+                        user.getStatus(),
+                        user.getRoles().stream().map(Role::getId).toList()
                 ))
                 .collect(Collectors.toList());
     }
@@ -82,6 +94,11 @@ public class UserService {
         // Só atualiza a senha se ela vier preenchida do frontend
         if (request.password() != null && !request.password().isBlank()) {
             user.setPasswordHash(passwordEncoder.encode(request.password()));
+        }
+
+        if (request.roleIds() != null) {
+            Set<Role> roles = new HashSet<>(roleRepository.findAllById(request.roleIds()));
+            user.setRoles(roles);
         }
 
         user.setUpdatedAt(OffsetDateTime.now());

@@ -28,4 +28,21 @@ public class RoleDTO {
             String description,
             UUID applicationId
     ){}
+
+    @Builder
+    public record RoleList(
+            UUID uuid,
+            String name,
+            String description,
+            String application,
+            Integer status
+    ){}
+
+    @Builder
+    public record RoleUpdate(
+            String name,
+            String description,
+            Integer status,
+            Set<UUID> permissionsIds
+    ){}
 }

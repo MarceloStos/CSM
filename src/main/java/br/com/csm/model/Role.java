@@ -3,6 +3,7 @@ package br.com.csm.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -35,8 +36,12 @@ public class Role {
     private Integer status = 1;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private OffsetDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id", nullable = false)
@@ -48,6 +53,6 @@ public class Role {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    @Builder.Default
+
     private Set<Permission> permissions = new HashSet<>();
 }

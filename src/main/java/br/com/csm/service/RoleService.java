@@ -11,9 +11,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,4 +66,53 @@ public class RoleService {
                 .applicationId(app.getId())
                 .build();
     }
+
+    public List<RoleDTO.RoleList> listAllRoles () {
+        return roleRepository.findByStatusNot(0).stream()
+                .map(role -> new RoleDTO.RoleList(
+                        role.getId(),
+                        role.getName(),
+                        role.getDescription(),
+                        role.getApplication().getName(),
+                        role.getStatus()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateRole (UUID roleId, RoleDTO.RoleUpdate request) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Perfil não encontrado!"));
+
+        if (request.name() != null && !request.name().isBlank()) role.setName(request.name());
+        if (request.description() != null && !request.description().isBlank()) role.setDescription(request.description());
+        if (request.status() != null) role.setStatus(request.status());
+
+        if (request.permissionsIds() != null) {
+            List<Permission> permissions = permissionRepository.findAllById(request.permissionsIds());
+            boolean allMatchApp = permissions.stream()
+                    .allMatch(p -> p.getApplication().getId().equals(role.getApplication().getId()));
+
+            if (!allMatchApp) {
+                throw new IllegalArgumentException("Uma ou mais permissões não pertencem à aplicação deste perfil.");
+            }
+
+            role.setPermissions(new HashSet<>(permissions));
+        }
+
+        role.setUpdatedAt(OffsetDateTime.now());
+        roleRepository.save(role);
+    }
+
+    @Transactional
+    public void deleteRole(UUID roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Perfil não encontrado!"));
+
+        // Soft Delete
+        role.setStatus(0); // 0 = Inativo
+
+        roleRepository.save(role);
+    }
+
 }

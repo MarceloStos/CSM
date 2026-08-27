@@ -49,11 +49,11 @@ public class AuthService {
             userRepository.save(user);
         }
 
-        Set<String> roles = user.getRole().stream()
+        Set<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toSet());
 
-        Set<String> permissions = user.getRole().stream()
+        Set<String> permissions = user.getRoles().stream()
                 .flatMap(role -> role.getPermissions().stream())
                 .map(Permission::getName)
                 .collect(Collectors.toSet());

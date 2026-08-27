@@ -19,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO.UserList>> listAll() {
+    public ResponseEntity<List<UserDTO.UserList>> listAllUsers() {
         List<UserDTO.UserList> users = userService.listAllUsers();
         return ResponseEntity.ok(users);
     }
@@ -31,13 +31,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable UUID id, @RequestBody UserDTO.UserUpdate request) {
+    public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO.UserUpdate request) {
         userService.updateUser(id, request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Sucesso, sem corpo de resposta
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
     }

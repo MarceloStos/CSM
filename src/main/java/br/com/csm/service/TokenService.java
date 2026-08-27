@@ -25,11 +25,11 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            List<String> roles = user.getRole().stream()
+            List<String> roles = user.getRoles().stream()
                     .map(Role::getName)
                     .toList();
 
-            List<String> permissions = user.getRole().stream()
+            List<String> permissions = user.getRoles().stream()
                     .flatMap(role -> role.getPermissions().stream())
                     .map(Permission::getName)
                     .distinct()

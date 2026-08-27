@@ -78,12 +78,12 @@ public class User {
 
     private OffsetDateTime lastLogin;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles", schema = "csm",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @Builder.Default
-    private Set<Role> role = new HashSet<>();
+
+    private Set<Role> roles = new HashSet<>();
 }

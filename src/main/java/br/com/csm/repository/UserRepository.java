@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByLoginAndStatusAndDeletedAtIsNull(String login, Integer status);
 
     @Query("SELECT u FROM User u " +
-            "LEFT JOIN FETCH u.role r " +
+            "LEFT JOIN FETCH u.roles r " +
             "LEFT JOIN FETCH r.permissions " +
             "WHERE u.login = :login " +
             "AND u.status = :status " +

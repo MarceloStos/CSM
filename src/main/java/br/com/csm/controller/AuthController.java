@@ -1,19 +1,15 @@
 package br.com.csm.controller;
 
 import br.com.csm.dto.AuthDTO;
-import br.com.csm.dto.PermissionDTO;
 import br.com.csm.dto.UserDTO;
 import br.com.csm.model.User;
 import br.com.csm.service.AuthService;
-import br.com.csm.service.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
@@ -29,11 +24,17 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/userinfo")
-    public ResponseEntity<UserDTO.UserInfoResponse> userInfo(@Valid @RequestBody UserDTO.UserInfoRequest request) {
+    @GetMapping("/userinfo")
+    public ResponseEntity<UserDTO.UserInfoResponse> userInfo() {
 
-        User user = authService.userInfo(request.id());
+        // 1. Pega o usuário raso (apenas com ID e Login) do contexto de segurança do Spring
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User tokenUser = (User) authentication.getPrincipal();
 
+        // 2. Busca o usuário com todos os dados corporativos no banco usando o ID seguro do token
+        User user = authService.userInfo(tokenUser.getId());
+
+        // 3. Constrói as partes da resposta
         UserDTO.UserInfoResponse.UserDate userDate = UserDTO.UserInfoResponse.UserDate.builder()
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
@@ -56,6 +57,7 @@ public class AuthController {
                 .blockedUntil(user.getBlockedUntil())
                 .build();
 
+        // 4. Constrói o response final
         UserDTO.UserInfoResponse response = UserDTO.UserInfoResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -68,8 +70,5 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(response);
-
-
     }
-
 }

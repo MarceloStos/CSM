@@ -1,10 +1,10 @@
 package br.com.csm.permission;
 
-import br.com.csm.model.Application;
+import br.com.csm.application.Application;
 import br.com.csm.permission.dto.PermissionCreateRequest;
 import br.com.csm.permission.dto.PermissionResponse;
 import br.com.csm.permission.dto.PermissionUpdateRequest;
-import br.com.csm.repository.ApplicationRepository;
+import br.com.csm.application.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,6 @@
 package br.com.csm.permission;
 
-import br.com.csm.model.Application;
+import br.com.csm.application.Application;
 import jakarta.persistence.*;
 import lombok.*;
 

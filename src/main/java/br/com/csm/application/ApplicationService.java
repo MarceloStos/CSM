@@ -1,20 +1,16 @@
-package br.com.csm.service;
+package br.com.csm.application;
 
-import br.com.csm.dto.ApplicationDTO;
-import br.com.csm.dto.ApplicationDTO;
-import br.com.csm.model.Application;
-import br.com.csm.model.Role;
-import br.com.csm.model.User;
-import br.com.csm.repository.ApplicationRepository;
+import br.com.csm.application.dto.ApplicationCreateRequest;
+import br.com.csm.application.dto.ApplicationCreateResponse;
+import br.com.csm.application.dto.ApplicationSummaryResponse;
+import br.com.csm.application.dto.ApplicationUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,8 +22,7 @@ public class ApplicationService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public ApplicationDTO.CreateResponse createApplication(ApplicationDTO.CreateRequest request) {
-
+    public ApplicationCreateResponse createApplication(ApplicationCreateRequest request) {
 
         if (applicationRepository.findByAcronym(request.acronym()).isPresent()) {
             throw new IllegalArgumentException("Já existe um sistema com o este acronimo.");
@@ -54,7 +49,7 @@ public class ApplicationService {
 
         Application app = applicationRepository.save(application);
 
-        return ApplicationDTO.CreateResponse.builder()
+        return ApplicationCreateResponse.builder()
                 .id(app.getId())
                 .name(app.getName())
                 .acronym(app.getAcronym())
@@ -63,14 +58,15 @@ public class ApplicationService {
                 .build();
     }
 
-    public List<ApplicationDTO.ApplicationList> listAllApplications() {
+    public List<ApplicationSummaryResponse> listAllApplications() {
         return applicationRepository.findAllByDeactivatedAtIsNull().stream()
-                .map(app -> new ApplicationDTO.ApplicationList(
+                .map(app -> new ApplicationSummaryResponse(
                         app.getId(),
                         app.getName(),
                         app.getAcronym(),
                         app.getUrl(),
                         app.getStatus(),
+                        app.getIsPublished(),
                         app.getUpdatedAt(),
                         app.getCreatedAt()
                 ))
@@ -78,7 +74,7 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void updateApplication (UUID appId, ApplicationDTO.ApplicationUpdate request) {
+    public void updateApplication (UUID appId, ApplicationUpdateRequest request) {
         Application app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new RuntimeException("Sistema não encontrado!"));
 
@@ -86,6 +82,7 @@ public class ApplicationService {
         if (request.acronym() != null && !request.acronym().isBlank()) app.setAcronym(request.acronym());
         if (request.url() != null && !request.url().isBlank()) app.setUrl(request.url());
         if (request.status() != null) app.setStatus(request.status());
+        if (request.isPublished() != null) app.setIsPublished(request.isPublished());
 
         app.setUpdatedAt(OffsetDateTime.now());
         applicationRepository.save(app);

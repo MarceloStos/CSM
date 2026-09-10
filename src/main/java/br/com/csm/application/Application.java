@@ -1,4 +1,4 @@
-package br.com.csm.model;
+package br.com.csm.application;
 
 import jakarta.persistence.*;
 import lombok.*;

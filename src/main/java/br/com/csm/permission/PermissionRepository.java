@@ -1,6 +1,5 @@
-package br.com.csm.repository;
+package br.com.csm.permission;
 
-import br.com.csm.model.Permission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

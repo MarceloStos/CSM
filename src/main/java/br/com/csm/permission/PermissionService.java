@@ -1,22 +1,15 @@
-package br.com.csm.service;
+package br.com.csm.permission;
 
-import br.com.csm.dto.PermissionDTO;
-import br.com.csm.dto.RoleDTO;
-import br.com.csm.dto.UserDTO;
 import br.com.csm.model.Application;
-import br.com.csm.model.Permission;
-import br.com.csm.model.Role;
-import br.com.csm.model.User;
+import br.com.csm.permission.dto.PermissionCreateRequest;
+import br.com.csm.permission.dto.PermissionResponse;
+import br.com.csm.permission.dto.PermissionUpdateRequest;
 import br.com.csm.repository.ApplicationRepository;
-import br.com.csm.repository.PermissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,7 +21,7 @@ public class PermissionService {
     private final ApplicationRepository applicationRepository;
 
     @Transactional
-    public PermissionDTO.Response createPermission (PermissionDTO.CreateRequest request) {
+    public PermissionResponse createPermission (PermissionCreateRequest request) {
 
         Application app = applicationRepository.findById(request.applicationId())
                 .orElseThrow(() -> new IllegalArgumentException("Aplicação não encontrada."));
@@ -45,7 +38,7 @@ public class PermissionService {
 
         Permission savedPermission = permissionRepository.save(permission);
 
-        return PermissionDTO.Response.builder()
+        return PermissionResponse.builder()
                 .id(savedPermission.getId())
                 .name(savedPermission.getName())
                 .description(savedPermission.getDescription())
@@ -53,20 +46,20 @@ public class PermissionService {
 
     }
 
-    public List<PermissionDTO.PermissionList> listAllPermissions () {
+    public List<PermissionResponse> listAllPermissions () {
         return permissionRepository.findAll().stream()
-                .map(permission -> new PermissionDTO.PermissionList(
+                .map(permission -> new PermissionResponse(
                         permission.getId(),
                         permission.getName(),
                         permission.getDescription(),
-                        permission.getApplication().getName(),
-                        permission.getApplication().getId()
+                        permission.getApplication().getId(),
+                        permission.getApplication().getName()
                 ))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updatePermission (UUID permissionId, PermissionDTO.PermissionUpdate request) {
+    public void updatePermission (UUID permissionId, PermissionUpdateRequest request) {
         Permission permission = permissionRepository.findById(permissionId)
                 .orElseThrow(() -> new RuntimeException("Permissão não encontrada!"));
 

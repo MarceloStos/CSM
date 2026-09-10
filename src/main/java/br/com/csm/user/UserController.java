@@ -1,7 +1,9 @@
-package br.com.csm.controller;
+package br.com.csm.user;
 
-import br.com.csm.dto.UserDTO;
-import br.com.csm.service.UserService;
+import br.com.csm.user.dto.UserCreateRequest;
+import br.com.csm.user.dto.UserDetailsResponse;
+import br.com.csm.user.dto.UserSummaryResponse;
+import br.com.csm.user.dto.UserUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,19 +21,19 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO.UserList>> listAllUsers() {
-        List<UserDTO.UserList> users = userService.listAllUsers();
+    public ResponseEntity<List<UserSummaryResponse>> listAllUsers() {
+        List<UserSummaryResponse> users = userService.listAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO.UserResponse> createUser (@Valid @RequestBody UserDTO.CreateRequest request) {
-        UserDTO.UserResponse user = userService.createUser(request);
+    public ResponseEntity<UserDetailsResponse> createUser (@Valid @RequestBody UserCreateRequest request) {
+        UserDetailsResponse user = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserDTO.UserUpdate request) {
+    public ResponseEntity<Void> updateUser(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
         userService.updateUser(id, request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Sucesso, sem corpo de resposta
     }

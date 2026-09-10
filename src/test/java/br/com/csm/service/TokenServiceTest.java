@@ -1,8 +1,8 @@
 package br.com.csm.service;
 
 import br.com.csm.core.security.TokenService;
-import br.com.csm.model.Permission;
-import br.com.csm.model.Role;
+import br.com.csm.permission.Permission;
+import br.com.csm.role.Role;
 import br.com.csm.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

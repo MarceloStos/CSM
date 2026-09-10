@@ -1,5 +1,6 @@
-package br.com.csm.model;
+package br.com.csm.user;
 
+import br.com.csm.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,10 +1,11 @@
-package br.com.csm.service;
+package br.com.csm.user;
 
-import br.com.csm.dto.UserDTO;
-import br.com.csm.model.Role;
-import br.com.csm.model.User;
-import br.com.csm.repository.RoleRepository;
-import br.com.csm.repository.UserRepository;
+import br.com.csm.role.Role;
+import br.com.csm.role.RoleRepository;
+import br.com.csm.user.dto.UserCreateRequest;
+import br.com.csm.user.dto.UserDetailsResponse;
+import br.com.csm.user.dto.UserSummaryResponse;
+import br.com.csm.user.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserDTO.UserResponse createUser(UserDTO.CreateRequest request) {
+    public UserDetailsResponse createUser(UserCreateRequest request) {
 
         // Para verificação de unicidade
         if (userRepository.findByLogin(request.login()).isPresent()) {
@@ -62,39 +63,37 @@ public class UserService {
         return responseDTO(savedUser);
     }
 
-    public UserDTO.UserResponse getUserById(UUID id) {
+    public UserDetailsResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         return responseDTO(user);
     }
 
-    public List<UserDTO.UserList> listAllUsers () {
+    public List<UserSummaryResponse> listAllUsers () {
         return userRepository.findAllByDeletedAtIsNull().stream()
-                .map(user -> new UserDTO.UserList(
+                .map(user -> new UserSummaryResponse(
                         user.getId(),
                         user.getName(),
                         user.getLogin(),
                         user.getEmail(),
                         user.getStatus(),
-                        user.getRoles().stream().map(Role::getId).toList()
+                        user.getRoles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.toSet())
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
-    public void updateUser (UUID userId, UserDTO.UserUpdate request) {
+    public void updateUser (UUID userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
         if (request.name() != null && !request.name().isBlank()) user.setName(request.name());
-        if (request.login() != null && !request.login().isBlank()) user.setLogin(request.login());
         if (request.email() != null && !request.email().isBlank()) user.setEmail(request.email());
 
-        // Só atualiza a senha se ela vier preenchida do frontend
-        if (request.password() != null && !request.password().isBlank()) {
-            user.setPasswordHash(passwordEncoder.encode(request.password()));
-        }
+        if (request.status() != null) user.setStatus(request.status());
 
         if (request.roleIds() != null) {
             Set<Role> roles = new HashSet<>(roleRepository.findAllById(request.roleIds()));
@@ -116,15 +115,32 @@ public class UserService {
 
         userRepository.save(user);
     }
-    private UserDTO.UserResponse responseDTO(User user) {
-        return UserDTO.UserResponse.builder()
+    private UserDetailsResponse responseDTO(User user) {
+        return UserDetailsResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .cpf(user.getCpf())
                 .login(user.getLogin())
                 .email(user.getEmail())
-                .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
+                .userDate(UserDetailsResponse.UserDate.builder()
+                        .createdAt(user.getCreatedAt())
+                        .updatedAt(user.getUpdatedAt())
+                        .deletedAt(user.getDeletedAt())
+                        .lastLogin(user.getLastLogin())
+                        .build())
+                .userCorporativeData(UserDetailsResponse.UserCorporativeData.builder()
+                        .objectguid(user.getObjectguid())
+                        .registrationNumber(user.getRegistrationNumber())
+                        .status(user.getStatus())
+                        .hiddenTutorial(false)
+                        .unitId(user.getUnitId())
+                        .contractId(user.getContractId()).photoId(user.getPhotoId())
+                        .build())
+                .userSecurity(UserDetailsResponse.UserSecurity.builder()
+                        .failedAttempts(user.getFailedAttempts())
+                        .blockedUntil(user.getBlockedUntil())
+                        .build())
                 .build();
     }
 }

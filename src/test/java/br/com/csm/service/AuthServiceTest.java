@@ -1,8 +1,11 @@
 package br.com.csm.service;
 
-import br.com.csm.dto.AuthDTO;
-import br.com.csm.model.User;
-import br.com.csm.repository.UserRepository;
+import br.com.csm.auth.AuthService;
+import br.com.csm.auth.dto.AuthResponse;
+import br.com.csm.auth.dto.LoginRequest;
+import br.com.csm.core.security.TokenService;
+import br.com.csm.user.User;
+import br.com.csm.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +51,7 @@ public class AuthServiceTest {
         mockUser.setFailedAttempts(4);
         mockUser.setBlockedUntil(null);
 
-        AuthDTO.LoginRequest request = new AuthDTO.LoginRequest(login, rawPassword);
+        LoginRequest request = new LoginRequest(login, rawPassword);
 
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(rawPassword, mockUser.getPasswordHash())).thenReturn(false);
@@ -90,13 +93,13 @@ public class AuthServiceTest {
         mockUser.setRoles(Set.of());
 
 
-        AuthDTO.LoginRequest request = new AuthDTO.LoginRequest(login, password);
+        LoginRequest request = new LoginRequest(login, password);
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches(password, mockUser.getPasswordHash())).thenReturn(true);
         when(tokenService.generateToken(mockUser)).thenReturn(token);
 
         // Act
-        AuthDTO.AuthResponse response = authService.authenticate(request);
+        AuthResponse response = authService.authenticate(request);
 
         // assert
 
@@ -127,7 +130,7 @@ public class AuthServiceTest {
         mockUser.setPasswordHash("senha_correta");
         mockUser.setStatus(0);
 
-        AuthDTO.LoginRequest request = new AuthDTO.LoginRequest(login, password);
+        LoginRequest request = new LoginRequest(login, password);
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(mockUser));
 
         // Act
@@ -153,7 +156,7 @@ public class AuthServiceTest {
         mockUser.setPasswordHash("senha_correta");
         mockUser.setBlockedUntil(OffsetDateTime.now().plusMinutes(30));
 
-        AuthDTO.LoginRequest request = new AuthDTO.LoginRequest(login, password);
+        LoginRequest request = new LoginRequest(login, password);
         when(userRepository.findByLogin(login)).thenReturn(Optional.of(mockUser));
 
         // Act

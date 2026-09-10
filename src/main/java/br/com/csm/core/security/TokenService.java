@@ -1,8 +1,8 @@
-package br.com.csm.service;
+package br.com.csm.core.security;
 
 import br.com.csm.model.Permission;
 import br.com.csm.model.Role;
-import br.com.csm.model.User;
+import br.com.csm.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;

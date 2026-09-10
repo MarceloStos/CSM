@@ -1,10 +1,7 @@
-package br.com.csm.config;
+package br.com.csm.core.security;
 
-import br.com.csm.model.Permission;
-import br.com.csm.model.Role;
-import br.com.csm.model.User;
-import br.com.csm.repository.UserRepository;
-import br.com.csm.service.TokenService;
+import br.com.csm.user.User;
+import br.com.csm.user.UserRepository;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
@@ -23,8 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

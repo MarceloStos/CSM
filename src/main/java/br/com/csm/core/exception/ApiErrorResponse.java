@@ -1,18 +1,14 @@
-package br.com.csm.dto;
+package br.com.csm.core.exception;
 
 import lombok.Builder;
 
 import java.time.OffsetDateTime;
 
-public class ErrorDTO {
-
-    @Builder
-    public record ApiErrorResponse (
+@Builder
+public record ApiErrorResponse (
             OffsetDateTime timestamp,
             Integer status,
             String error,
             String message,
             String path
-    ){}
-
-}
+){}

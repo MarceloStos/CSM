@@ -1,8 +1,6 @@
-package br.com.csm.config;
+package br.com.csm.core.security;
 
-import br.com.csm.model.User;
-import br.com.csm.repository.UserRepository;
-import br.com.csm.service.TokenService;
+import br.com.csm.user.User;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

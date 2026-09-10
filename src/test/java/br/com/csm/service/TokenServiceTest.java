@@ -1,8 +1,9 @@
 package br.com.csm.service;
 
+import br.com.csm.core.security.TokenService;
 import br.com.csm.model.Permission;
 import br.com.csm.model.Role;
-import br.com.csm.model.User;
+import br.com.csm.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.security.KeyRep.Type.SECRET;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)

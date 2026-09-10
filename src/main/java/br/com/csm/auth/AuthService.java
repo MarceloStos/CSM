@@ -2,12 +2,12 @@ package br.com.csm.auth;
 
 import br.com.csm.auth.dto.AuthResponse;
 import br.com.csm.auth.dto.LoginRequest;
-import br.com.csm.config.exceptions.AuthenticationException;
+import br.com.csm.core.exception.AuthenticationException;
 import br.com.csm.model.Permission;
 import br.com.csm.model.Role;
 import br.com.csm.user.User;
 import br.com.csm.user.UserRepository;
-import br.com.csm.service.TokenService;
+import br.com.csm.core.security.TokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

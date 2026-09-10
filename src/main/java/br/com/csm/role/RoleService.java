@@ -1,12 +1,12 @@
-package br.com.csm.service;
+package br.com.csm.role;
 
-import br.com.csm.dto.RoleDTO;
-import br.com.csm.model.Application;
-import br.com.csm.model.Permission;
-import br.com.csm.model.Role;
-import br.com.csm.repository.ApplicationRepository;
-import br.com.csm.repository.PermissionRepository;
-import br.com.csm.repository.RoleRepository;
+import br.com.csm.application.Application;
+import br.com.csm.permission.Permission;
+import br.com.csm.application.ApplicationRepository;
+import br.com.csm.permission.PermissionRepository;
+import br.com.csm.role.dto.RoleCreateRequest;
+import br.com.csm.role.dto.RoleResponse;
+import br.com.csm.role.dto.RoleUpdateRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class RoleService {
     private final ApplicationRepository applicationRepository;
 
     @Transactional
-    public RoleDTO.Response createRole (RoleDTO.CreateRequest request) {
+    public RoleResponse createRole (RoleCreateRequest request) {
         Application app = applicationRepository.findById(request.applicationId())
                 .orElseThrow(() -> new IllegalArgumentException("Aplicação não encontrada."));
 
@@ -59,7 +59,7 @@ public class RoleService {
 
         Role savedrole = roleRepository.save(role);
 
-        return RoleDTO.Response.builder()
+        return RoleResponse.builder()
                 .id(savedrole.getId())
                 .name(savedrole.getName())
                 .description(savedrole.getDescription())
@@ -67,20 +67,21 @@ public class RoleService {
                 .build();
     }
 
-    public List<RoleDTO.RoleList> listAllRoles () {
+    public List<RoleResponse> listAllRoles () {
         return roleRepository.findByStatusNot(0).stream()
-                .map(role -> new RoleDTO.RoleList(
+                .map(role -> new RoleResponse(
                         role.getId(),
                         role.getName(),
                         role.getDescription(),
-                        role.getApplication().getName(),
-                        role.getStatus()
+                        role.getStatus(),
+                        role.getApplication().getId(),
+                        role.getPermissions().stream().map(Permission::getName).collect(Collectors.toSet())
                 ))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
-    public void updateRole (UUID roleId, RoleDTO.RoleUpdate request) {
+    public void updateRole (UUID roleId, RoleUpdateRequest request) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new RuntimeException("Perfil não encontrado!"));
 
@@ -88,8 +89,8 @@ public class RoleService {
         if (request.description() != null && !request.description().isBlank()) role.setDescription(request.description());
         if (request.status() != null) role.setStatus(request.status());
 
-        if (request.permissionsIds() != null) {
-            List<Permission> permissions = permissionRepository.findAllById(request.permissionsIds());
+        if (request.permissionIds() != null) {
+            List<Permission> permissions = permissionRepository.findAllById(request.permissionIds());
             boolean allMatchApp = permissions.stream()
                     .allMatch(p -> p.getApplication().getId().equals(role.getApplication().getId()));
 

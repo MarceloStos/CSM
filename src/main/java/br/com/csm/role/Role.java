@@ -1,5 +1,7 @@
-package br.com.csm.model;
+package br.com.csm.role;
 
+import br.com.csm.application.Application;
+import br.com.csm.permission.Permission;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,7 +27,7 @@ public class Role {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 50)
     private String name;
 
     @Column(length = 255)

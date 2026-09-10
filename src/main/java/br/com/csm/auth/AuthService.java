@@ -1,17 +1,15 @@
-package br.com.csm.service;
+package br.com.csm.auth;
 
-import br.com.csm.dto.AuthDTO;
-import br.com.csm.exception.AuthenticationException;
+import br.com.csm.auth.dto.AuthResponse;
+import br.com.csm.auth.dto.LoginRequest;
+import br.com.csm.config.exceptions.AuthenticationException;
 import br.com.csm.model.Permission;
 import br.com.csm.model.Role;
-import br.com.csm.model.User;
-import br.com.csm.repository.UserRepository;
+import br.com.csm.user.User;
+import br.com.csm.user.UserRepository;
+import br.com.csm.service.TokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +24,17 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
-    private final PasswordEncoder passwordEncoder; // <- Usaremos o PasswordEncoder direto!
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AuthDTO.AuthResponse authenticate(AuthDTO.LoginRequest request) {
+    public AuthResponse authenticate(LoginRequest request) {
 
         User user = userRepository.findByLogin(request.login())
                 .orElseThrow(() -> new AuthenticationException("Usuário ou senha inválidos"));
+
+        if (user.getStatus() == 0 || user.getDeletedAt() != null) {
+            throw new AuthenticationException("Usuário inativo ou excluído do sistema.");
+        }
 
         if (user.getBlockedUntil() != null && user.getBlockedUntil().isAfter(OffsetDateTime.now())) {
             throw new AuthenticationException("Usuário temporariamente bloqueado por excesso de tentativas.");
@@ -58,7 +60,7 @@ public class AuthService {
                 .map(Permission::getName)
                 .collect(Collectors.toSet());
 
-        AuthDTO.AuthResponse.UserSummary userSummary = AuthDTO.AuthResponse.UserSummary.builder()
+        AuthResponse.UserSummary userSummary = AuthResponse.UserSummary.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .login(user.getLogin())
@@ -69,7 +71,7 @@ public class AuthService {
         // 6. Gera o Token e devolve o DTO
         String token = tokenService.generateToken(user);
 
-        return AuthDTO.AuthResponse.builder()
+        return AuthResponse.builder()
                 .accessToken(token)
                 .tokenType("Bearer")
                 .expiresIn(900)

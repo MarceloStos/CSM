@@ -1,9 +1,9 @@
-package br.com.csm.controller;
+package br.com.csm.auth;
 
-import br.com.csm.dto.AuthDTO;
-import br.com.csm.dto.UserDTO;
-import br.com.csm.model.User;
-import br.com.csm.service.AuthService;
+import br.com.csm.auth.dto.AuthResponse;
+import br.com.csm.auth.dto.LoginRequest;
+import br.com.csm.user.User;
+import br.com.csm.user.dto.UserDetailsResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,13 +19,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest request) {
-        AuthDTO.AuthResponse response = authService.authenticate(request);
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.authenticate(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/userinfo")
-    public ResponseEntity<UserDTO.UserInfoResponse> userInfo() {
+    public ResponseEntity<UserDetailsResponse> userInfo() {
 
         // 1. Pega o usuário raso (apenas com ID e Login) do contexto de segurança do Spring
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -35,14 +35,14 @@ public class AuthController {
         User user = authService.userInfo(tokenUser.getId());
 
         // 3. Constrói as partes da resposta
-        UserDTO.UserInfoResponse.UserDate userDate = UserDTO.UserInfoResponse.UserDate.builder()
+        UserDetailsResponse.UserDate userDate = UserDetailsResponse.UserDate.builder()
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .deletedAt(user.getDeletedAt())
                 .lastLogin(user.getLastLogin())
                 .build();
 
-        UserDTO.UserInfoResponse.UserCorporativeData userCorporativeData = UserDTO.UserInfoResponse.UserCorporativeData.builder()
+        UserDetailsResponse.UserCorporativeData userCorporativeData = UserDetailsResponse.UserCorporativeData.builder()
                 .objectguid(user.getObjectguid())
                 .registrationNumber(user.getRegistrationNumber())
                 .status(user.getStatus())
@@ -52,13 +52,13 @@ public class AuthController {
                 .photoId(user.getPhotoId())
                 .build();
 
-        UserDTO.UserInfoResponse.UserSecurity userSecurity = UserDTO.UserInfoResponse.UserSecurity.builder()
+        UserDetailsResponse.UserSecurity userSecurity = UserDetailsResponse.UserSecurity.builder()
                 .failedAttempts(user.getFailedAttempts())
                 .blockedUntil(user.getBlockedUntil())
                 .build();
 
         // 4. Constrói o response final
-        UserDTO.UserInfoResponse response = UserDTO.UserInfoResponse.builder()
+        UserDetailsResponse response = UserDetailsResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .cpf(user.getCpf())

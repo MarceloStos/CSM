@@ -1,9 +1,6 @@
 package br.com.csm.application;
 
-import br.com.csm.application.dto.ApplicationCreateRequest;
-import br.com.csm.application.dto.ApplicationCreateResponse;
-import br.com.csm.application.dto.ApplicationSummaryResponse;
-import br.com.csm.application.dto.ApplicationUpdateRequest;
+import br.com.csm.application.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +21,12 @@ public class ApplicationController {
     public ResponseEntity<List<ApplicationSummaryResponse>> listAllApplications() {
         List<ApplicationSummaryResponse> applications = applicationService.listAllApplications();
         return ResponseEntity.status(HttpStatus.OK).body(applications);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApplicationDetailsResponse> viewApplication(@PathVariable UUID id) {
+        ApplicationDetailsResponse application = applicationService.getApplicationById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(application);
     }
 
     @PostMapping

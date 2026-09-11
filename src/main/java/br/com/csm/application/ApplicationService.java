@@ -1,9 +1,7 @@
 package br.com.csm.application;
 
-import br.com.csm.application.dto.ApplicationCreateRequest;
-import br.com.csm.application.dto.ApplicationCreateResponse;
-import br.com.csm.application.dto.ApplicationSummaryResponse;
-import br.com.csm.application.dto.ApplicationUpdateRequest;
+import br.com.csm.application.dto.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -73,10 +71,14 @@ public class ApplicationService {
                 .collect(Collectors.toList());
     }
 
+    public ApplicationDetailsResponse getApplicationById(UUID appId) {
+        Application app = findEntityById(appId);
+        return responseDTO(app);
+    }
+
     @Transactional
     public void updateApplication (UUID appId, ApplicationUpdateRequest request) {
-        Application app = applicationRepository.findById(appId)
-                .orElseThrow(() -> new RuntimeException("Sistema não encontrado!"));
+        Application app = findEntityById(appId);
 
         if (request.name() != null && !request.name().isBlank()) app.setName(request.name());
         if (request.acronym() != null && !request.acronym().isBlank()) app.setAcronym(request.acronym());
@@ -91,12 +93,42 @@ public class ApplicationService {
     @Transactional
     public void deleteApplication(UUID appId) {
         Application app = applicationRepository.findById(appId)
-                .orElseThrow(() -> new RuntimeException("Sistema não encontrado!"));
+                .orElseThrow(() -> new EntityNotFoundException("Sistema não encontrado!"));
 
         // Soft Delete
         app.setDeactivatedAt(OffsetDateTime.now());
         app.setStatus(0); // 0 = Inativo
 
         applicationRepository.save(app);
+    }
+
+    private ApplicationDetailsResponse responseDTO(Application app) {
+        return ApplicationDetailsResponse.builder()
+                .id(app.getId())
+                .clientId(app.getClientId())
+                .name(app.getName())
+                .acronym(app.getAcronym())
+                .url(app.getUrl())
+                .redirectUri(app.getRedirectUri())
+                .status(app.getStatus())
+                .isPublished(app.getIsPublished())
+                .governanceData(ApplicationDetailsResponse.AppGovernanceData.builder()
+                        .objective(app.getObjective())
+                        .notes(app.getNotes())
+                        .requester(app.getRequester())
+                        .projectStartDate(app.getProjectStartDate())
+                        .gitNamespace(app.getGitNamespace())
+                        .build())
+                .dateData(ApplicationDetailsResponse.AppDateData.builder()
+                        .createdAt(app.getCreatedAt())
+                        .updatedAt(app.getUpdatedAt())
+                        .deactivatedAt(app.getDeactivatedAt())
+                        .build())
+                .build();
+    }
+
+    private Application findEntityById(UUID id) {
+        return applicationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sistema não encontrado!"));
     }
 }

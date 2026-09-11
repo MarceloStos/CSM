@@ -6,6 +6,7 @@ import br.com.csm.user.dto.UserCreateRequest;
 import br.com.csm.user.dto.UserDetailsResponse;
 import br.com.csm.user.dto.UserSummaryResponse;
 import br.com.csm.user.dto.UserUpdateRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -63,9 +64,8 @@ public class UserService {
         return responseDTO(savedUser);
     }
 
-    public UserDetailsResponse getUserById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+    public UserDetailsResponse getUserById(UUID userId) {
+        User user = findEntityById(userId);
 
         return responseDTO(user);
     }
@@ -87,8 +87,7 @@ public class UserService {
 
     @Transactional
     public void updateUser (UUID userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+        User user = findEntityById(userId);
 
         if (request.name() != null && !request.name().isBlank()) user.setName(request.name());
         if (request.email() != null && !request.email().isBlank()) user.setEmail(request.email());
@@ -106,8 +105,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+        User user = findEntityById(userId);
 
         // Soft Delete
         user.setDeletedAt(OffsetDateTime.now());
@@ -142,5 +140,10 @@ public class UserService {
                         .blockedUntil(user.getBlockedUntil())
                         .build())
                 .build();
+    }
+
+    private User findEntityById (UUID id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado!"));
     }
 }

@@ -23,7 +23,13 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserSummaryResponse>> listAllUsers() {
         List<UserSummaryResponse> users = userService.listAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDetailsResponse> viewUser(@PathVariable UUID id) {
+        UserDetailsResponse user = userService.getUserById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping

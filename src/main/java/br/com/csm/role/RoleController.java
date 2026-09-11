@@ -31,6 +31,12 @@ public class RoleController {
         return ResponseEntity.status(HttpStatus.OK).body(roles);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RoleResponse> viewRole(@PathVariable UUID id) {
+        RoleResponse role = roleService.getRoleById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(role);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateRole(@PathVariable UUID id, @RequestBody RoleUpdateRequest request) {
         roleService.updateRole(id, request);

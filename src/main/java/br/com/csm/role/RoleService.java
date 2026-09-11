@@ -7,6 +7,7 @@ import br.com.csm.permission.PermissionRepository;
 import br.com.csm.role.dto.RoleCreateRequest;
 import br.com.csm.role.dto.RoleResponse;
 import br.com.csm.role.dto.RoleUpdateRequest;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -80,10 +81,25 @@ public class RoleService {
                 .toList();
     }
 
+    public RoleResponse getRoleById(UUID roleId) {
+        Role role = findEntityById(roleId);
+
+        return RoleResponse.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .description(role.getDescription())
+                .status(role.getStatus())
+                .applicationId(role.getApplication().getId())
+                .permissions(
+                        role.getPermissions().stream()
+                                .map(Permission::getName)
+                                .collect(Collectors.toSet()))
+                .build();
+    }
+
     @Transactional
     public void updateRole (UUID roleId, RoleUpdateRequest request) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado!"));
+        Role role = findEntityById(roleId);
 
         if (request.name() != null && !request.name().isBlank()) role.setName(request.name());
         if (request.description() != null && !request.description().isBlank()) role.setDescription(request.description());
@@ -107,13 +123,17 @@ public class RoleService {
 
     @Transactional
     public void deleteRole(UUID roleId) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado!"));
+        Role role = findEntityById(roleId);
 
         // Soft Delete
         role.setStatus(0); // 0 = Inativo
 
         roleRepository.save(role);
+    }
+
+    private Role findEntityById (UUID id) {
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Perfil não encontrado!"));
     }
 
 }

@@ -33,6 +33,12 @@ public class PermissionController {
         return ResponseEntity.status(HttpStatus.OK).body(permissions);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PermissionResponse> viewPermission(@PathVariable UUID id) {
+        PermissionResponse permission = permissionService.getPermissionById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(permission);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> updatePermisson(@PathVariable UUID id, @RequestBody PermissionUpdateRequest request) {
         permissionService.updatePermission(id, request);

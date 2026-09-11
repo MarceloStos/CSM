@@ -1,5 +1,6 @@
 package br.com.csm.core.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +80,23 @@ public class GlobalExceptionHandler {
                 .status(status.value())
                 .error("Validation error")
                 .message(message)
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleEntityNotFoundException(
+            EntityNotFoundException ex, HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .timestamp(OffsetDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
 

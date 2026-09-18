@@ -9,9 +9,10 @@ import java.util.UUID;
 @Builder
 public record AuthResponse(
         String accessToken,
+        String refreshToken,
         String tokenType,
         Integer expiresIn,
-        AuthResponse.UserSummary user
+        UserSummary user
 ) {
     @Builder
     public record UserSummary(

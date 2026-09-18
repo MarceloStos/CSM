@@ -141,7 +141,7 @@ public class AuthServiceTest {
         // assert
         verify(tokenService, never()).generateToken(any());
 
-        assertEquals("Usuário inativo ou excluído do sistema.", exception.getMessage());;
+        assertEquals("Usuário inativo ou excluído do sistema.", exception.getMessage());
     }
 
     @Test
@@ -167,7 +167,7 @@ public class AuthServiceTest {
         // assert
         verify(tokenService, never()).generateToken(any());
 
-        assertEquals("Usuário temporariamente bloqueado por excesso de tentativas.", exception.getMessage());;
+        assertEquals("Usuário temporariamente bloqueado por excesso de tentativas.", exception.getMessage());
     }
 }
 

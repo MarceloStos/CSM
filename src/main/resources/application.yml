@@ -25,6 +25,11 @@ spring:
         # Isso faz o Java entender que 'passwordHash' no codigo e 'password_hash' no banco
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
     api:
       security:
         token:

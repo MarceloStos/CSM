@@ -2,6 +2,8 @@ package br.com.csm.auth;
 
 import br.com.csm.auth.dto.AuthResponse;
 import br.com.csm.auth.dto.LoginRequest;
+import br.com.csm.auth.dto.TokenRefreshRequest;
+import br.com.csm.auth.dto.TokenRefreshResponse;
 import br.com.csm.core.exception.AuthenticationException;
 import br.com.csm.permission.Permission;
 import br.com.csm.role.Role;
@@ -25,6 +27,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse authenticate(LoginRequest request) {
@@ -68,14 +71,44 @@ public class AuthService {
                 .permissions(permissions)
                 .build();
 
-        // 6. Gera o Token e devolve o DTO
+        // 6. Gera o JWT (de 15 min)
         String token = tokenService.generateToken(user);
+
+        // 7. Gera o Refresh Token No Redis (até então 7 dias)
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         return AuthResponse.builder()
                 .accessToken(token)
+                .refreshToken(refreshToken.getToken())
                 .tokenType("Bearer")
-                .expiresIn(900)
+                .expiresIn(10)
                 .user(userSummary)
+                .build();
+    }
+
+    @Transactional
+    public TokenRefreshResponse refreshToken (TokenRefreshRequest request) {
+
+        RefreshToken refreshToken = refreshTokenService.verifyAndGetToken(request.refreshToken());
+
+        User user = userRepository.findById(refreshToken.getUserId())
+                .orElseThrow(() -> new AuthenticationException("Usuário não encontrado ou sessão inválida."));
+
+        if (user.getStatus() == 0 || user.getDeletedAt() != null) {
+            throw new AuthenticationException("Usuário inativo ou excluído do sistema.");
+        }
+
+        String newAccessToken = tokenService.generateToken(user);
+
+
+        // Possibilidade, caso eu queira renovar o Refresh Token a cada uso, gera um novo aqui (analisar)
+        // RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
+        // String refreshTokenValue = newRefreshToken.getToken();
+        return TokenRefreshResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken.getToken()) // Retorna o mesmo refresh token
+                .tokenType("Bearer")
+                .expiresIn(900) // 900 segundos (15 minutos)
                 .build();
     }
 

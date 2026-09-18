@@ -2,6 +2,8 @@ package br.com.csm.auth;
 
 import br.com.csm.auth.dto.AuthResponse;
 import br.com.csm.auth.dto.LoginRequest;
+import br.com.csm.auth.dto.TokenRefreshRequest;
+import br.com.csm.auth.dto.TokenRefreshResponse;
 import br.com.csm.user.User;
 import br.com.csm.user.dto.UserDetailsResponse;
 import jakarta.validation.Valid;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final RefreshTokenService refreshTokenService;
     private final AuthService authService;
 
     @PostMapping("/login")
@@ -70,5 +73,11 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponse> refreshToken (@Valid @RequestBody TokenRefreshRequest request) {
+        TokenRefreshResponse response = authService.refreshToken(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

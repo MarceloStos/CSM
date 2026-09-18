@@ -107,6 +107,7 @@ CREATE TABLE csm.roles
     status         int2        DEFAULT 1                 NOT NULL,
 
     created_at     timestamptz DEFAULT current_timestamp NOT NULL,
+    updated_at     timestamptz DEFAULT current_timestamp NOT NULL,
 
     -- Relationship Constraints
     CONSTRAINT fk_roles_applications FOREIGN KEY (application_id) REFERENCES csm.applications (id) ON DELETE CASCADE,

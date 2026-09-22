@@ -63,7 +63,7 @@ public class TokenService {
     }
 
     private Instant generateExpirationDate() {
-        return OffsetDateTime.now().plusMinutes(15).toInstant();
+        return OffsetDateTime.now().plusMinutes(10).toInstant();
     }
 
 }

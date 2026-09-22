@@ -81,7 +81,7 @@ public class AuthService {
                 .accessToken(token)
                 .refreshToken(refreshToken.getToken())
                 .tokenType("Bearer")
-                .expiresIn(10)
+                .expiresIn(600)
                 .user(userSummary)
                 .build();
     }
@@ -108,7 +108,7 @@ public class AuthService {
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken.getToken()) // Retorna o mesmo refresh token
                 .tokenType("Bearer")
-                .expiresIn(900) // 900 segundos (15 minutos)
+                .expiresIn(600) // 600 segundos (10 minutos)
                 .build();
     }
 

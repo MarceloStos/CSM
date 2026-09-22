@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/csm_db?currentSchema=csm
+    url: jdbc:postgresql://192.168.0.103:5433/csm_db?currentSchema=csm
     username: postgres
     password: ${DB_PASSWORD:postgres}
 
@@ -27,7 +27,7 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: 192.168.0.103
       port: 6379
 
     api:

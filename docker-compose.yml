@@ -1,5 +1,5 @@
 services:
-  # O Banco de Dados
+  # O Banco de Dados PostgreSQL
   db:
     image: postgres:16-alpine
     container_name: csm_postgres
@@ -8,42 +8,29 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: csm_db
     ports:
-      - "5433:5432"
+      - "5433:5432" # Mapeia a porta interna 5432 para 5433 na rede local
     volumes:
       - csm_data:/var/lib/postgresql/data
-
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d csm_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # A Aplicação Spring Boot
-  app:
-    build:
-      context: .
-      target: build
-
-    container_name: csm_app
-    entrypoint: [""]
-    command: ./mvnw spring-boot:run
+  # O Cache e Mensageria Redis
+  redis:
+    image: redis:7-alpine
+    container_name: csm_redis
     ports:
-      - "8080:8080"
-    depends_on:
-      db:
-        condition: service_healthy
+      - "6379:6379" # Exposta na rede local para a sua máquina principal
     volumes:
-      - ./:/app
-      - ~/.m2:/root/.m2
-    environment:
-      # Credenciais da Aplicação
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/csm_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      # Credenciais do Flyway
-      SPRING_FLYWAY_URL: jdbc:postgresql://db:5432/csm_db
-      SPRING_FLYWAY_USER: postgres
-      SPRING_FLYWAY_PASSWORD: postgres
+      - csm_redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   csm_data:
+  csm_redis_data:

@@ -25,6 +25,18 @@ spring:
         # Isso faz o Java entender que 'passwordHash' no codigo e 'password_hash' no banco
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
 
+  kafka:
+    bootstrap-servers: 192.168.0.103:9092
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.103:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+
   data:
     redis:
       host: 192.168.0.103
@@ -35,3 +47,9 @@ spring:
         token:
           # Nota: A string de fallback precisa ter mais de 32 caracteres para o algoritmo HMAC256 funcionar.
           secret: ${CSM_JWT_SECRET:chave-padrao-provisoria-para-testes-locais-1234567890}
+
+csm:
+  kafka:
+    topic:
+      audit: csm.audit.events
+

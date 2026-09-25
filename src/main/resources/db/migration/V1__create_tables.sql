@@ -168,3 +168,39 @@ CREATE TABLE csm.role_permissions
     CONSTRAINT fk_rp_role FOREIGN KEY (role_id) REFERENCES csm.roles (id) ON DELETE CASCADE,
     CONSTRAINT fk_rp_permission FOREIGN KEY (permission_id) REFERENCES csm.permissions (id) ON DELETE CASCADE
 );
+
+-- ----------------------------------------------------------------------------
+-- 7. CSM_AUDIT_LOGS TABLE
+-- Stores immutable audit events, tracking actions, HTTP context and JSON payloads.
+-- ----------------------------------------------------------------------------
+CREATE TABLE csm.audit_logs
+(
+    -- Primary Key
+    id               uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+
+    -- Event Temporal Data & Traceability
+    timestamp        timestamptz                           NOT NULL,
+    system_origin    varchar(100)                          NOT NULL,
+    trace_id         varchar(64),
+
+    -- Event Categorization
+    log_level        varchar(20)                           NOT NULL,
+    event_type       varchar(50)                           NOT NULL,
+    action           varchar(100)                          NOT NULL,
+    status           varchar(20),
+
+    -- User Context
+    user_id          uuid,
+    username         varchar(150),
+
+    -- HTTP Context
+    ip_address       varchar(45),
+    http_method      varchar(10),
+    endpoint         varchar(255),
+
+    -- Payloads & Error Details
+    payload_request  jsonb,
+    payload_response jsonb,
+    error_message    text,
+    stack_trace      text
+);

@@ -1,5 +1,9 @@
 package br.com.csm.auth;
 
+import br.com.csm.audit.dto.AuditMessage;
+import br.com.csm.audit.enums.EventType;
+import br.com.csm.audit.enums.LogLevel;
+import br.com.csm.audit.message.AuditLogProducer;
 import br.com.csm.auth.dto.AuthResponse;
 import br.com.csm.auth.dto.LoginRequest;
 import br.com.csm.auth.dto.TokenRefreshRequest;
@@ -10,11 +14,15 @@ import br.com.csm.role.Role;
 import br.com.csm.user.User;
 import br.com.csm.user.UserRepository;
 import br.com.csm.core.security.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +36,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final AuditLogProducer auditLogProducer;
 
     @Transactional
     public AuthResponse authenticate(LoginRequest request) {
@@ -77,6 +86,25 @@ public class AuthService {
         // 7. Gera o Refresh Token No Redis (até então 7 dias)
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
+        HttpServletRequest httpRequest = getHttpRequest();
+
+        AuditMessage auditMessage = AuditMessage.builder()
+                .timestamp(Instant.now()).systemOrigin("CSM-IAM")
+                .traceId(UUID.randomUUID().toString())
+                .logLevel(LogLevel.AUDIT)
+                .eventType(EventType.SECURITY)
+                .action("LOGIN_SUCCESS")
+                .status("SUCCESS")
+                .userId(user.getId())
+                .username(user.getLogin())
+                .ipAddress(getClientIp(httpRequest))
+                .httpMethod(httpRequest != null ? httpRequest.getMethod() : "UNKNOWN")
+                .endpoint(httpRequest != null ? httpRequest.getRequestURI() : "UNKNOWN")
+                .payloadRequest("{\"login\": \"" + request.login() + "\"}")
+                .build();
+
+        auditLogProducer.sendLog(auditMessage);
+
         return AuthResponse.builder()
                 .accessToken(token)
                 .refreshToken(refreshToken.getToken())
@@ -125,5 +153,20 @@ public class AuthService {
         }
 
         userRepository.save(user);
+    }
+
+    private HttpServletRequest getHttpRequest() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getRequest() : null;
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        if (request == null) return "UNKNOWN";
+
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }

@@ -3,7 +3,6 @@ package br.com.csm.permission;
 import br.com.csm.application.Application;
 import br.com.csm.permission.dto.PermissionCreateRequest;
 import br.com.csm.permission.dto.PermissionResponse;
-import br.com.csm.permission.dto.PermissionUpdateRequest;
 import br.com.csm.application.ApplicationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -69,23 +68,6 @@ public class PermissionService {
                 .applicationId(permission.getApplication().getId())
                 .applicationName(permission.getApplication().getName())
                 .build();
-    }
-
-    @Transactional
-    public void updatePermission (UUID permissionId, PermissionUpdateRequest request) {
-        Permission permission = findEntityById(permissionId);
-
-        if (request.name() != null && !request.name().isBlank()) permission.setName(request.name());
-        if (request.description() != null && !request.description().isBlank()) permission.setDescription(request.description());
-
-        permissionRepository.save(permission);
-}
-
-    @Transactional
-    public void deletePermission(UUID permissionId) {
-        Permission permission = findEntityById(permissionId);
-
-        // Ver como deletar uma permissao (analisar se deve excluir uma permissao)
     }
 
     private Permission findEntityById(UUID id) {

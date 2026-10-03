@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,31 +19,35 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     public ResponseEntity<List<ApplicationSummaryResponse>> listAllApplications() {
         List<ApplicationSummaryResponse> applications = applicationService.listAllApplications();
         return ResponseEntity.status(HttpStatus.OK).body(applications);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     public ResponseEntity<ApplicationDetailsResponse> viewApplication(@PathVariable UUID id) {
         ApplicationDetailsResponse application = applicationService.getApplicationById(id);
         return ResponseEntity.status(HttpStatus.OK).body(application);
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
     public ResponseEntity<ApplicationCreateResponse> createApplication (@Valid @RequestBody ApplicationCreateRequest request) {
-
         ApplicationCreateResponse response = applicationService.createApplication(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
     public ResponseEntity<Void> updateApplication(@PathVariable UUID id, @RequestBody ApplicationUpdateRequest request) {
         applicationService.updateApplication(id, request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Sucesso, sem corpo de resposta
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('APPLICATION_DELETE')")
     public ResponseEntity<Void> deleteApplication(@PathVariable UUID id) {
         applicationService.deleteApplication(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 No Content
